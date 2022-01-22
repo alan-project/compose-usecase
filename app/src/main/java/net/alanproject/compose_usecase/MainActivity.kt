@@ -19,10 +19,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import timber.log.Timber
 
-
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+//        setContent(content = {
+//            MainScreen()
+//        })
+        // content: @Composable () -> Unit
+        // UI Component
         setContent {
             Timber.d("setContent")
             MainScreen()
@@ -30,13 +35,16 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-
+// UI component that has to be displayed: Starts with capital
 @Composable
 fun MainScreen() {
+    // MainScreen control all the states
 
     Timber.d("MainScreen")
-    val greetingListState = remember {mutableStateListOf("alan", "elin","joyel")}
-    val newNameStateContent = remember {mutableStateOf("")}
+    // SnapshotStateList: can recompose whenever state changes
+    // remember: remember state after recomposition
+    val greetingListState = remember { mutableStateListOf("alan", "elin", "joyel") }
+    val newNameStateContent = remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -45,8 +53,8 @@ fun MainScreen() {
     ) {
         GreetingList(
             greetingListState,
-            newNameStateContent.value, //textFieldValue
-            { input -> newNameStateContent.value = input }, //textFieldUpdate
+            newNameStateContent.value, //textFieldValue, state
+            { input -> newNameStateContent.value = input }, //textFieldUpdate, state
             { greetingListState.add(newNameStateContent.value) }, //buttonClick
         )
     }
@@ -70,6 +78,7 @@ fun GreetingList(
     TextField(value = textFieldValue, onValueChange = textFieldUpdate)
 
     //Button
+    //RowScope is the last function parameter(lambda)
     Button(onClick = buttonClick) {
         Text("Add new")
     }
@@ -81,9 +90,17 @@ fun Greeting(name: String) {
     Text(
         text = "Hello $name!",
         style = MaterialTheme.typography.h5
+/*
+        style = TextStyle(
+            color = Color.Blue,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.dp
+        )
+ */
     )
 }
 
+//same as composable in setContent
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
