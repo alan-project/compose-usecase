@@ -28,6 +28,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen(viewModel: MainViewModel = MainViewModel()) {
+    //observing livedata and return it as state
     val names = viewModel.textFieldState.observeAsState(listOf())
 
     Column(
