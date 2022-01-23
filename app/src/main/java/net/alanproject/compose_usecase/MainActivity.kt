@@ -12,20 +12,23 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import coil.compose.rememberImagePainter
 import coil.transform.CircleCropTransformation
 import net.alanproject.compose_usecase.ui.UserProfile
@@ -49,13 +52,21 @@ fun UsersApplication(userProfiles: List<UserProfile> = userProfileList) {
     //navigation controller for jetpack to remember actual control state
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "users_list") {
+
         //navGraphBuilder to control how to build the navigation Graph
         //and navGraph is a map of screens
-        composable(route = "users_list"){
+        composable(route = "users_list") {
             UserListScreen(userProfiles, navController)
         }
-        composable(route = "user_details"){
-            UserProfileDetailsScreen()
+
+        //pass parameter
+        composable(
+            route = "user_details/{userId}",
+            arguments = listOf(navArgument("userId") {
+                type = NavType.IntType
+            })
+        ) { navBackStackEntry ->
+            UserProfileDetailsScreen(navBackStackEntry.arguments!!.getInt("userId"), navController)
         }
     }
 }
@@ -64,7 +75,14 @@ fun UsersApplication(userProfiles: List<UserProfile> = userProfileList) {
 @Composable
 fun UserListScreen(userProfiles: List<UserProfile>, navController: NavHostController?) {
     // top-level container to add or pass layout like TopBar, BottomBar, FAB or a Drawer
-    Scaffold(topBar = { AppBar() }) {
+    Scaffold(topBar = {
+        AppBar(
+            title = "Users List",
+            icon = Icons.Default.Home
+        ){
+            //do nothing
+        }
+    }) {
         //background
         Surface(
             // color, parameter of Surface is set as Material Theme.color.surface by default
@@ -74,9 +92,10 @@ fun UserListScreen(userProfiles: List<UserProfile>, navController: NavHostContro
             modifier = Modifier.fillMaxSize()
         ) {
             LazyColumn {
+                //'items' iterate actual items
                 items(userProfiles) { userProfile ->
-                    ProfileCard(userProfile = userProfile){
-                        navController?.navigate("user_details")
+                    ProfileCard(userProfile = userProfile) {
+                        navController?.navigate("user_details/${userProfile.id}")
                     }
                 }
             }
@@ -85,8 +104,18 @@ fun UserListScreen(userProfiles: List<UserProfile>, navController: NavHostContro
 }
 
 @Composable
-fun UserProfileDetailsScreen(userProfile: UserProfile = userProfileList[0]) {
-    Scaffold(topBar = { AppBar() }) {
+fun UserProfileDetailsScreen(userId: Int, navController: NavHostController?) {
+
+    val userProfile = userProfileList.first { userProfile -> userProfile.id == userId}
+    Scaffold(topBar = {
+        AppBar(
+            title = "Users profile details",
+            icon = Icons.Default.ArrowBack
+        ){
+            //pop most current composable
+            navController?.navigateUp()
+        }
+    }) {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -105,21 +134,23 @@ fun UserProfileDetailsScreen(userProfile: UserProfile = userProfileList[0]) {
 }
 
 @Composable
-fun AppBar() {
+fun AppBar(title: String, icon: ImageVector, iconClickAction: () -> Unit) {
     TopAppBar(
         navigationIcon = {
             Icon(
-                Icons.Default.Home,
+                imageVector = icon,
                 contentDescription = "",
-                modifier = Modifier.padding(horizontal = 12.dp),
+                modifier = Modifier
+                    .padding(horizontal = 12.dp)
+                    .clickable(onClick = { iconClickAction.invoke() })
             )
         },
-        title = { Text("Messaging Application users") }
+        title = { Text(title) }
     )
 }
 
 @Composable
-fun ProfileCard(userProfile: UserProfile, clickAction: ()->Unit) {
+fun ProfileCard(userProfile: UserProfile, clickAction: () -> Unit) {
     Card(
         modifier = Modifier
             .padding(top = 8.dp, bottom = 4.dp, start = 16.dp, end = 16.dp)
@@ -207,12 +238,11 @@ fun ProfileContent(userName: String, onlineStatus: Boolean, alignment: Alignment
 }
 
 
-
 @Preview(showBackground = true)
 @Composable
 fun UserProfileDetailsPreview() {
     CustomTheme {
-        UserProfileDetailsScreen()
+        UserProfileDetailsScreen(userId = 0, null)
     }
 }
 
