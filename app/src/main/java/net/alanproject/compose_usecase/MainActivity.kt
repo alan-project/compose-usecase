@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -15,10 +17,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberImagePainter
+import coil.transform.CircleCropTransformation
 import net.alanproject.compose_usecase.ui.UserProfile
 import net.alanproject.compose_usecase.ui.theme.CustomTheme
 import net.alanproject.compose_usecase.ui.theme.lightGreen
@@ -47,9 +49,10 @@ fun MainScreen(userProfiles: List<UserProfile> = userProfileList) {
 //            color = MaterialTheme.colors.black,
             modifier = Modifier.fillMaxSize()
         ) {
-            Column {
-                for (userProfile in userProfiles)
+            LazyColumn {
+                items(userProfiles){userProfile->
                     ProfileCard(userProfile = userProfile)
+                }
             }
         }
     }
@@ -84,7 +87,7 @@ fun ProfileCard(userProfile: UserProfile) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            ProfilePicture(userProfile.drawableId, userProfile.status)
+            ProfilePicture(userProfile.pictureUrl, userProfile.status)
             ProfileContent(userProfile.name, userProfile.status)
         }
 
@@ -92,7 +95,7 @@ fun ProfileCard(userProfile: UserProfile) {
 }
 
 @Composable
-fun ProfilePicture(drawableId: Int, onlineStatus: Boolean) {
+fun ProfilePicture(pictureUrl: String, onlineStatus: Boolean) {
     //by wrapping Image with Card, we can use shape, border, elevation parameter
     Card(
         shape = RoundedCornerShape(50),
@@ -108,11 +111,17 @@ fun ProfilePicture(drawableId: Int, onlineStatus: Boolean) {
         modifier = Modifier.padding(16.dp),
         elevation = 4.dp
     ) {
+
         Image(
-            painter = painterResource(id = drawableId),
+            //loaded asynchronously
+            painter = rememberImagePainter(
+                data = pictureUrl,
+                builder = {
+                    transformations(CircleCropTransformation())
+                }
+            ),
             modifier = Modifier.size(72.dp),
-            contentScale = ContentScale.Crop,
-            contentDescription = ""
+            contentDescription = "Profile picture description",
         )
     }
 }
