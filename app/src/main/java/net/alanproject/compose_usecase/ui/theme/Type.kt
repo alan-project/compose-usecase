@@ -13,6 +13,7 @@ val typography = Typography(
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp
     ),
+    //I override h5 here, and code refer here.
     h5 = TextStyle(
         fontWeight = FontWeight.SemiBold,
         fontSize = 22.sp,

@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -37,8 +37,14 @@ class MainActivity : AppCompatActivity() {
 
 @Composable
 fun MainScreen(userProfiles: List<UserProfile> = userProfileList) {
+    // top-level container to add or pass layout like TopBar, BottomBar, FAB or a Drawer
     Scaffold(topBar = { AppBar() }) {
+        //background
         Surface(
+            // color, parameter of Surface is set as Material Theme.color.surface by default
+            // so that color is derived from veryLightGrey in Theme.kt
+            // and need to be careful as colors in Theme.kt is called in many places
+//            color = MaterialTheme.colors.black,
             modifier = Modifier.fillMaxSize()
         ) {
             Column {
@@ -87,10 +93,14 @@ fun ProfileCard(userProfile: UserProfile) {
 
 @Composable
 fun ProfilePicture(drawableId: Int, onlineStatus: Boolean) {
+    //by wrapping Image with Card, we can use shape, border, elevation parameter
     Card(
-        shape = CircleShape,
+        shape = RoundedCornerShape(50),
         border = BorderStroke(
             width = 2.dp,
+            //Color.Green is default value by Jetpack.
+            //so to utilize colors in Theme.kt,
+            // we need to define color and extension func
             color = if (onlineStatus)
                 MaterialTheme.colors.lightGreen
             else Color.Red
@@ -114,17 +124,20 @@ fun ProfileContent(userName: String, onlineStatus: Boolean) {
             .padding(8.dp)
             .fillMaxWidth()
     ) {
+        //transparency
         CompositionLocalProvider(
             LocalContentAlpha provides (
-                    if (onlineStatus)
-                        1f else ContentAlpha.medium)
+                    //0f..1f
+                    if (onlineStatus) 1f else ContentAlpha.medium)
         ) {
             Text(
                 text = userName,
                 style = MaterialTheme.typography.h5
             )
         }
-        CompositionLocalProvider(LocalContentAlpha provides (ContentAlpha.medium)) {
+        CompositionLocalProvider(
+            LocalContentAlpha provides (ContentAlpha.medium)
+        ) {
             Text(
                 text = if (onlineStatus)
                     "Active now"

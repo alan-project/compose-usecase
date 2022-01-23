@@ -11,7 +11,16 @@ val teal200 = Color(0xFF03DAC5)
 
 val veryLightGrey = Color(0x60DCDCDC)
 val lightGreen200 = Color(0x9932CD32)
+val black200 = Color(0x99E90909)
+
+
+// This is to use custom Color
+// because LightGreen200 is not predefined in Theme.
 
 val Colors.lightGreen: Color
-    @Composable
+    @Composable // will returns composable
     get() = lightGreen200
+
+val Colors.black: Color
+    @Composable // will returns composable
+    get() = black200

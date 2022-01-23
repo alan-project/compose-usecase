@@ -10,5 +10,4 @@ val userProfileList = arrayListOf(
     UserProfile(name = "Joyel Kim", status = true, R.drawable.profile_picture3),
     UserProfile(name = "David Smith ", status = false, R.drawable.profile_picture4),
     UserProfile(name = "Maria Hernandez", status = true, R.drawable.profile_picture5),
-    UserProfile(name = "Robert Smith", status = false, R.drawable.profile_picture6)
 )
